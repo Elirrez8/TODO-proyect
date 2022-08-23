@@ -10,3 +10,14 @@ import Home from "./component/home.jsx";
 
 //render your react application
 ReactDOM.render(<Home />, document.querySelector("#app"));
+
+function App() {
+    return (
+        <div className="App">
+            <span className="title">Todo</span> <br />
+          <Home  />
+        </div>
+    )
+}
+
+export default App;
