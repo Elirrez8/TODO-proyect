@@ -9,9 +9,10 @@ import "../styles/index.css";
 import Home from "./component/home.jsx";
 
 //render your react application
-ReactDOM.render(<Home />, document.querySelector("#app"));
+ReactDOM.render(<Home username="Elizabeth"/>, document.querySelector("#app"));
 
-function App(S) {
+const App=(props)=>{
+
     return (
         <div className="App">
             <span className="title">Todo</span> <br />

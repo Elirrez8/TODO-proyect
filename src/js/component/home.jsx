@@ -1,23 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const Home = () => {
+const Home = (prop) => {
 	const [task, setTask] = useState("")
 	const [tasklist, setTaskList] = useState([]);
+	const urlPostman="http://assets.breatheco.de/apis/fake/todos/user/"
 
+
+useEffect(()=>{
+//component did mount
+fetch(urlPostman + prop.username)
+.then(response=>{
+	if(response.ok){
+		return response.json()
+	}
+	console.log(response.statusText)
+})
+.then(data=>setTaskList(data))
+.catch(error=>console.error(error))
+   
+},[])
+
+useEffect(() => {
+
+	fetch(urlPostman+prop.username,{
+		method: "PUT",
+		body: JSON.stringify(tasklist),
+		headers: {
+			"Content-Type": "application/json"
+		}
+	}).then(resp=>{
+		if(resp.ok){
+			console.log("List Updated")
+		}else{
+			console.log(resp.statusText)
+		}
+
+	}).catch(error=>console.error({error}))
+
+}, [tasklist])
 
 	/*Evento para Eliminar tareas de la lista*/
 	const handleChange = (e) => {
 		setTask(e.target.value);
 	}
 
-	/*Evento para definir si la tarea fue Completada o NO */
+	/*Aca actualizo los datos */
 	const handleSubmit = (event) => {
     event.preventDefault()
 	const data=new FormData(event.target)
 	setTaskList([...tasklist, {
-		name:data.get("name"),
-		done:data.get("done")
+		label:data.get("name"),
+		done:data.get("done")=="on"?true:false
 	}])
+
+	
     }
 
 /* funcion AGREGAR tarea */
@@ -33,57 +69,53 @@ const AddTask = () => {
 	}
 }
 
-/*funcion ELIMINAR tarea */
+/*funcion ELIMINAR tarea especifica*/
 const deletetask = (e, id) => {
 	e.preventDefault();
 	setTaskList(tasklist.filter(t => t.id != id));
 }
 
+const check=(index)=>{
+	let newTask=[...tasklist]
+	newTask[index].done=!newTask[index].done
+	setTaskList(newTask)
+		
+	}
+
 	return (
 
 		<div className="Todo" >
+	<div className="title">Eli's todos</div> 
+	
+	       <form onSubmit={handleSubmit}>
+ 
+	<input type="text" className="form-control" name="name" onChange={(e) => handleChange(e)} placeholder="Add task here..." />
 
-	<form onSubmit={handleSubmit}>
+     <div class="form-check">
+    <input classNmae="form-check-input" type="checkbox" name="done"></input>
+    <label className="form-check-label" htmlFor="done"></label>
+    </div>
 
-			<div class="form-check">
-        <label class="form-check-label" htmlFor="done"></label>
-        <input class="form-check-input" type="checkbox" name="done"></input>
-            </div>
+	<button className="add-btn" onClick={AddTask}>Add</button>
 
-           <div class="form-check">
-        <label class="form-check-label" htmlFor="name"></label>
-        <input class="form-check-input" type="checkbox" name="name"></input>
-            </div>
-	</form>
-
-		         <div className="title">Eli's todos</div> 
-					<input type="text" name="text" id="text" 
-					onChange={(e) => handleChange(e)} 
-					placeholder="Add task here..." />
-					<button className="add-btn" onClick={AddTask}>Add</button>
-
+             </form>
 
 		{tasklist !== [] ?
 
 			<ul>
-
 			{tasklist.map(t =>
-			      <li className="list-item">{t.value}
-			         <button className="delete" onClick={(e) => deletetask(e, t.id)}>Delete</button>
-			      </li>	
+	<li className="list-item" >{t.value}
+		<p className="flex-fill">{t.label}</p>
+        <span  onClick={()=>check(e, t.id)} className={`badge rounded-pill ${t.done?"bg-success":"bg-danger"}`}>{t.done?"Done":"Pending"}</span>
+        <button onClick={(e) => deletetask(e, t.id)}  className="delete" >Delete</button>
+    </li>	
 			)}
-
 			</ul>
 
 		: null}
 
 		</div>
-
 	);
 };
 
 export default Home;
-
-
-/**	<p className="flex-fill">{t.name}</p> 
-			 <span className="badgerounded-pill " + t.done?"bg-success":"bg-danger" >{t.done?"Done":"Pending"}</span> */
