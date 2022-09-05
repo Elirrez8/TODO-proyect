@@ -11,12 +11,12 @@ import Home from "./component/home.jsx";
 //render your react application
 ReactDOM.render(<Home username="Elizabeth"/>, document.querySelector("#app"));
 
-const App=(props)=>{
+const App=()=>{
 
     return (
         <div className="App">
             <span className="title">Todo</span> <br />
-          <Home  />
+          <Home />
         </div>
     )
 }
